@@ -149,7 +149,11 @@ def qemu_command(qemu: str, kernel: str, stage_dir: str, args) -> list[str]:
                 "-device", "nvme,serial=vxrun0,drive=vxrun0"]
     else:
         cmd += ["-drive", f"file=fat:{stage_dir},format=raw,if=ide"]
-    cmd += ["-nic", "user"] if args.network else ["-nic", "none"]
+    if args.network:
+        nic = "user" + "".join(f",hostfwd={rule}" for rule in args.hostfwd)
+        cmd += ["-nic", nic]
+    else:
+        cmd += ["-nic", "none"]
     cmd += ["-display", "none", "-serial", "stdio", "-monitor", "none"]
     if args.bootline:
         cmd += ["-append", args.bootline]
@@ -265,6 +269,9 @@ def parse_args(argv: list[str]):
                         help="pass no -append; the kernel uses its built-in boot line")
     parser.add_argument("--no-network", dest="network", action="store_false",
                         help="start the guest without a network card")
+    parser.add_argument("--hostfwd", action="append", default=[],
+                        help="forward a host port into the guest, e.g. tcp:127.0.0.1:19100-:9100 "
+                             "(repeatable)")
     parser.add_argument("--qemu-arg", action="append", default=[],
                         help="extra QEMU argument (repeatable)")
     parser.add_argument("--timeout", type=float, default=float(os.environ.get("VXRUN_TIMEOUT", 300)),
@@ -325,5 +332,14 @@ def main(argv: list[str]) -> int:
             target.close()
 
 
+def exit_on_sigterm() -> None:
+    """Turns SIGTERM (ctest timeouts, kill) into SystemExit, so `finally`
+    blocks run and QEMU is not left behind."""
+    def handler(signum, _frame):
+        raise SystemExit(128 + signum)
+    signal.signal(signal.SIGTERM, handler)
+
+
 if __name__ == "__main__":
+    exit_on_sigterm()
     sys.exit(main(sys.argv[1:]))
