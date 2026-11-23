@@ -1,0 +1,102 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "vx-local",
+      "hidden": true,
+      "description": "Where VxWorks is. VxWorks SDK: WIND_HOME is the unpacked SDK directory. Full VxWorks installation: add WIND_CC_SYSROOT (your VSB) and run cmake from a wrenv shell, and set HELLO_VX_KERNEL to your QEMU kernel image.",
+      "environment": {
+        "WIND_HOME": "/opt/wrsdk-vxworks7-qemu-1.18.0"
+      }
+    },
+    {
+      "name": "my-vx-rtp-debug",
+      "displayName": "(local) vx-rtp-debug",
+      "inherits": [
+        "vx-local",
+        "vx-rtp-debug"
+      ]
+    },
+    {
+      "name": "my-vx-rtp-release",
+      "displayName": "(local) vx-rtp-release",
+      "inherits": [
+        "vx-local",
+        "vx-rtp-release"
+      ]
+    },
+    {
+      "name": "my-vx-rtp-shared",
+      "displayName": "(local) vx-rtp-shared",
+      "inherits": [
+        "vx-local",
+        "vx-rtp-shared"
+      ]
+    },
+    {
+      "name": "my-vx-rtp-ubsan",
+      "displayName": "(local) vx-rtp-ubsan",
+      "inherits": [
+        "vx-local",
+        "vx-rtp-ubsan"
+      ]
+    },
+    {
+      "name": "my-vx-dkm",
+      "displayName": "(local) vx-dkm",
+      "inherits": [
+        "vx-local",
+        "vx-dkm"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "my-vx-rtp-debug",
+      "configurePreset": "my-vx-rtp-debug"
+    },
+    {
+      "name": "my-vx-rtp-release",
+      "configurePreset": "my-vx-rtp-release"
+    },
+    {
+      "name": "my-vx-rtp-shared",
+      "configurePreset": "my-vx-rtp-shared"
+    },
+    {
+      "name": "my-vx-rtp-ubsan",
+      "configurePreset": "my-vx-rtp-ubsan"
+    },
+    {
+      "name": "my-vx-dkm",
+      "configurePreset": "my-vx-dkm"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "my-vx-rtp-debug",
+      "configurePreset": "my-vx-rtp-debug",
+      "inherits": "vx-rtp-debug"
+    },
+    {
+      "name": "my-vx-rtp-release",
+      "configurePreset": "my-vx-rtp-release",
+      "inherits": "vx-rtp-release"
+    },
+    {
+      "name": "my-vx-rtp-shared",
+      "configurePreset": "my-vx-rtp-shared",
+      "inherits": "vx-rtp-shared"
+    },
+    {
+      "name": "my-vx-rtp-ubsan",
+      "configurePreset": "my-vx-rtp-ubsan",
+      "inherits": "vx-rtp-ubsan"
+    },
+    {
+      "name": "my-vx-dkm",
+      "configurePreset": "my-vx-dkm",
+      "inherits": "vx-dkm"
+    }
+  ]
+}
