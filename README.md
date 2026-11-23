@@ -1,16 +1,24 @@
 # vxworks-cpp-template
 
-A modern C++17 project template for **VxWorks 7**. You get a CMake project
-that builds the same code three ways:
+**A modern C++17 CMake project template for [VxWorks 7](https://www.windriver.com/products/vxworks),
+Wind River's real-time operating system, with unit tests that run on VxWorks.**
 
-- as a host program, which runs every usual quality gate (sanitizers, coverage,
-  clang-tidy, cppcheck, Doxygen);
-- as a **VxWorks RTP** (`.vxe`, user space);
-- as a **VxWorks DKM** (`.out`, downloadable kernel module).
+The same code builds for VxWorks in both of its execution models:
 
-`ctest` runs the VxWorks builds' tests **on VxWorks itself**: it boots the
-kernel in QEMU, runs the test binary there and reports the result like any
-native test. No board, FTP server or root access is needed.
+- **VxWorks RTP** (Real Time Process, `.vxe`): user-space applications with
+  their own memory protection;
+- **VxWorks DKM** (Downloadable Kernel Module, `.out`): code loaded into the
+  VxWorks kernel at run time.
+
+`ctest` runs the tests **on VxWorks**: it boots the VxWorks kernel in QEMU,
+runs each test binary in an RTP or loads it as a kernel module, and reports
+the result like any native test. You need neither a board nor Workbench, and
+no FTP server or root access either. All you need is the free
+[VxWorks SDK](https://forums.windriver.com/t/vxworks-software-development-kit-sdk/43)
+and QEMU.
+
+The library also builds as a host program, so the usual host gates run on
+the same code: sanitizers, coverage, clang-tidy, cppcheck and Doxygen.
 
 ```
 $ ctest --preset vx-rtp-debug
@@ -18,21 +26,22 @@ $ ctest --preset vx-rtp-debug
 100% tests passed, 0 tests failed out of 1
 ```
 
-It is built from [cpp-project-template](https://github.com/oguzhankynk/cpp-project-template).
-The layout, the presets and the quality gates are the same, with VxWorks
+It is the VxWorks counterpart of
+[cpp-project-template](https://github.com/oguzhankynk/cpp-project-template):
+the layout, the presets and the quality gates are the same, with VxWorks
 targets added.
 
 ## What's wired up
 
-| | Host presets | VxWorks presets |
+| | VxWorks presets | Host presets |
 |---|---|---|
-| Build | `debug`, `release` | `vx-rtp-debug`, `vx-rtp-release`, `vx-rtp-shared`, `vx-dkm` |
-| Unit tests | GoogleTest, one ctest entry per `TEST()` | the same GoogleTest suite, run in QEMU |
-| Kernel module test | - | `helloDkmSelfTest()`, loaded with `ld` and called from the kernel shell |
-| Sanitizers | `asan` (ASan + UBSan), `tsan` | `vx-rtp-ubsan` (UBSan, trap mode) |
-| Coverage, clang-tidy, cppcheck, Doxygen | `coverage`, `tidy`, `cppcheck`, `docs` targets | host only |
-| Install + `find_package(hello)` | yes | yes (`cmake --install` into a staging prefix) |
-| CI (GitHub Actions) | every push | optional self-hosted runner |
+| Build | `vx-rtp-debug`, `vx-rtp-release`, `vx-rtp-shared`, `vx-dkm` | `debug`, `release` |
+| Unit tests | GoogleTest suite, run on VxWorks in QEMU | the same suite, one ctest entry per `TEST()` |
+| Kernel module test | `helloDkmSelfTest()`, loaded with `ld` and called from the VxWorks kernel shell | - |
+| Sanitizers | `vx-rtp-ubsan` (UBSan, trap mode) | `asan` (ASan + UBSan), `tsan` |
+| Coverage, clang-tidy, cppcheck, Doxygen | run on the host build | `coverage`, `tidy`, `cppcheck`, `docs` targets |
+| Install + `find_package(hello)` | yes (`cmake --install` into a staging prefix) | yes |
+| CI (GitHub Actions) | optional self-hosted runner with the SDK | every push |
 
 Other pieces:
 
